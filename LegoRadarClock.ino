@@ -2,7 +2,7 @@
 Arduino Based Lego Train "Radar Clock"
 (C) Theodore "Waterbury" Wahrburg; 2012
 
-V.0.0.5
+V.0.0.6
 
 */
 
@@ -16,11 +16,19 @@ V.0.0.5
 #define IR_PIN        2
 
 
+//Indicates If IR Iterrupt Occured
+volatile int IR_Triggered = 0;
+
+volatile long startTime = 0;
+volatile long timeSinceLastIR =0;
+
+int count = 0;
 
 //Function for Infrared LED Interrupt
 void IR_Trigger()
 {
-  
+IR_Triggered = 1;
+digitalWrite(LED_STATUS, HIGH);  
 }  
 
 void setup() {
@@ -48,13 +56,31 @@ void setup() {
 
 void loop() 
   {
+
  
-    
+    if(IR_Triggered)
+    {
+      //Detaches IR Interrupt
+      detachInterrupt(0);
+      IR_Triggered = 0;
+      
+      timeSinceLastIR = micros() - startTime;
+      startTime = micros();
+      
+      Serial.print(count++);
+      Serial.print(" -- Time Between Last 2 IR Senses:");
+      Serial.println( float(timeSinceLastIR/1000000.0) );
+      
+      
+      
+      //Reattaches IR Interrupt
+      delay(30);
+      attachInterrupt(0, IR_Trigger, FALLING);
+    }
     
   //Test Code
-  DrawCoord(361,360,0,60);  
-  
-  delay(500);    
+  //DrawCoord(361,360,0,60);  
+  //delay(500);    
   }
   
 //Function Which draws points from 0-360 degrees as viewed clockwize. i.e., 90 Degrees Represents 3 O'Clock on Track
