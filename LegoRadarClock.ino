@@ -2,7 +2,7 @@
 Arduino Based Lego Train "Radar Clock"
 (C) Theodore "Waterbury" Wahrburg; 2012
 
-V.0.0.1
+V.0.0.2
 
 */
 
