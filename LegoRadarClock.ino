@@ -2,7 +2,7 @@
 Arduino Based Lego Train "Radar Clock"
 (C) Theodore "Waterbury" Wahrburg; 2012
 
-V.0.0.4
+V.0.0.5
 
 */
 
@@ -11,6 +11,11 @@ V.0.0.4
 #define LED_SECONDS   6
 #define LED_MINUTES   9
 #define LED_HOURS    10
+
+//define which pin houses IR Sensor
+#define IR_PIN        2
+
+
 
 //Function for Infrared LED Interrupt
 void IR_Trigger()
@@ -32,6 +37,12 @@ void setup() {
   pinMode(LED_SECONDS, OUTPUT);
   pinMode(LED_MINUTES, OUTPUT);
   pinMode(LED_HOURS, OUTPUT);
+  //Sets Up IR Pin as input, for interrupt
+  pinMode(IR_PIN, INPUT);
+  
+  //Sets up IR PIN to Interrupt Microcontroller as IR Detector pulls pin low
+  attachInterrupt(0, IR_Trigger, FALLING);
+  
 
 }
 
