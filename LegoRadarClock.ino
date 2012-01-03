@@ -2,7 +2,7 @@
 Arduino Based Lego Train "Radar Clock"
 (C) Theodore "Waterbury" Wahrburg; 2012
 
-V.0.0.6
+V.0.1.0
 
 */
 
@@ -21,6 +21,8 @@ volatile int IR_Triggered = 0;
 
 volatile long startTime = 0;
 volatile long timeSinceLastIR =0;
+ float intersection = 0;
+ float speedDifference = 0;
 
 int count = 0;
 
@@ -56,8 +58,10 @@ void setup() {
 
 void loop() 
   {
-
- 
+    //temp test
+    int seconds = 30;
+    int speedOfTrain = 0;
+    
     if(IR_Triggered)
     {
       //Detaches IR Interrupt
@@ -65,17 +69,39 @@ void loop()
       IR_Triggered = 0;
       
       timeSinceLastIR = micros() - startTime;
+      
+      speedOfTrain = float( 360/ (timeSinceLastIR/1000000.0) );
+      speedDifference =  speedOfTrain - 6;
+      intersection = ((seconds * 6.0) / speedDifference) * speedOfTrain;
+      
       startTime = micros();
       
       Serial.print(count++);
-      Serial.print(" -- Time Between Last 2 IR Senses:");
+      Serial.print(" -- Time Between Last 2 IR Senses: ");
       Serial.println( float(timeSinceLastIR/1000000.0) );
       
+      Serial.print("Speed is: ");
+      Serial.print(speedOfTrain);
+      Serial.println(" Degrees per second");
+      
+      
+      Serial.print("Speed Distance is: ");
+      Serial.print(speedDifference);
+      Serial.println(" Degrees per second");
+      
+      Serial.print("Intersection will be at: ");
+      Serial.print(intersection);
+      Serial.println(" Degrees");    
       
       
       //Reattaches IR Interrupt
       delay(30);
       attachInterrupt(0, IR_Trigger, FALLING);
+      
+      
+      
+      
+      
     }
     
   //Test Code
