@@ -12,6 +12,11 @@ V.0.0.4
 #define LED_MINUTES   9
 #define LED_HOURS    10
 
+//Function for Infrared LED Interrupt
+void IR_Trigger()
+{
+  
+}  
 
 void setup() {
   
@@ -34,11 +39,46 @@ void loop()
   {
  
     
+    
+  //Test Code
+  DrawCoord(361,360,0,60);  
+  
+  delay(500);    
   }
   
 //Function Which draws points from 0-360 degrees as viewed clockwize. i.e., 90 Degrees Represents 3 O'Clock on Track
 //HourDeg will illuminate LED that is reserved for Hours, ditto with Minutes and Seconds
-void DrawCoord(int hourDeg, int minuteDeg, int secondDeg)
+//timeToDisplay indicates in milliseconds how long to illuminate LED.
+void DrawCoord(int hourDeg, int minuteDeg, int secondDeg, int timeToDisplay)
 {
+
+//variables to indicate if degree values are valid
+int writeHour   = 0;  
+int writeMinute = 0;
+int writeSecond = 0;
+
+
+//Checks if degree values are valid  
+if(hourDeg >= 0 && hourDeg <= 360)
+ writeHour = 1;
+if(minuteDeg >= 0 && minuteDeg <= 360)
+ writeMinute = 1;
+if(secondDeg >= 0 && secondDeg <= 360)
+ writeSecond = 1;
+ 
+if (writeSecond)
+  digitalWrite(LED_SECONDS, HIGH);  
+if (writeMinute)
+  digitalWrite(LED_MINUTES, HIGH); 
+if (writeHour)
+  digitalWrite(LED_HOURS, HIGH);
+
+delay(timeToDisplay);  
+  
+digitalWrite(LED_SECONDS, LOW);
+digitalWrite(LED_MINUTES, LOW);
+digitalWrite(LED_HOURS, LOW);
+        
+  
   
 }
