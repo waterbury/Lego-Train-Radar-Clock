@@ -15,6 +15,9 @@ V.0.1.0
 //define which pin houses IR Sensor
 #define IR_PIN        2
 
+//define which pin detects for the direction of the train. Whether it is running clockwise, or counter-clockwise
+#define CLOCKWISE_DETECT A5     
+
 
 //Indicates If IR Iterrupt Occured
 volatile int IR_Triggered = 0;
@@ -23,7 +26,8 @@ volatile long startTime = 0;
 volatile long timeSinceLastIR =0;
  float intersection = 0;
  float speedDifference = 0;
-
+ 
+ 
 int count = 0;
 
 //Function for Infrared LED Interrupt
@@ -53,6 +57,9 @@ void setup() {
   //Sets up IR PIN to Interrupt Microcontroller as IR Detector pulls pin low
   attachInterrupt(0, IR_Trigger, FALLING);
   
+  pinMode(CLOCKWISE_DETECT, INPUT);           // set pin to detect whether train is moving clockwise to input
+  digitalWrite(CLOCKWISE_DETECT, HIGH);       // turn on pullup resistor for PIN. If High, train is moving clockwise
+  
 
 }
 
@@ -70,9 +77,17 @@ void loop()
       
       timeSinceLastIR = micros() - startTime;
       
+      //If train is moving clockwise, CLOCKWISE_DETECT will be HIGH, else if counter-clockwise pin will be LOW
+      if (CLOCKWISE_DETECT)
+      {
       speedOfTrain = float( 360/ (timeSinceLastIR/1000000.0) );
       speedDifference =  speedOfTrain - 6;
       intersection = ((seconds * 6.0) / speedDifference) * speedOfTrain;
+      }
+      else
+      {
+        
+      }
       
       startTime = micros();
       
