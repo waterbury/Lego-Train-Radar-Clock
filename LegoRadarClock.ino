@@ -2,7 +2,7 @@
 Arduino Based Lego Train "Radar Clock"
 (C) Theodore "Waterbury" Wahrburg; 2012
 
-V.0.1.0
+V.0.1.1
 
 */
 
@@ -16,7 +16,7 @@ V.0.1.0
 #define IR_PIN        2
 
 //define which pin detects for the direction of the train. Whether it is running clockwise, or counter-clockwise
-#define CLOCKWISE_DETECT A5     
+#define CLOCKWISE_DETECT 19     
 
 
 //Indicates If IR Iterrupt Occured
@@ -74,22 +74,40 @@ void loop()
       //Detaches IR Interrupt
       detachInterrupt(0);
       IR_Triggered = 0;
+      digitalWrite(LED_STATUS, LOW);  
       
       timeSinceLastIR = micros() - startTime;
+      startTime = micros();
       
       //If train is moving clockwise, CLOCKWISE_DETECT will be HIGH, else if counter-clockwise pin will be LOW
-      if (CLOCKWISE_DETECT)
+      if ( digitalRead(CLOCKWISE_DETECT) == HIGH)
       {
-      speedOfTrain = float( 360/ (timeSinceLastIR/1000000.0) );
-      speedDifference =  speedOfTrain - 6;
-      intersection = ((seconds * 6.0) / speedDifference) * speedOfTrain;
+      //Speed of train is determined by dividing the 360 degrees of the track circle by the time taken. 
+      speedOfTrain = float( 360/ (timeSinceLastIR) );
+      //It takes each hand of the clock 1 second to move 6 degrees around the clock. Subtract this to find relative speed of both "objects." Dividing by 1 million to turn micros to seconds..  
+      speedDifference =  (speedOfTrain/1000000.0) - 6;
+      //Find Where hands of clock will be in relation to start point. Divide this distance by relative speed to find intersecion.
+      intersectionSeconds = ((seconds * 6.0) / speedDifference) * speedOfTrain;
+      intersectionMinutes = ((minutes * 6.0) / speedDifference) * speedOfTrain;
+      intersectionSeconds = ((hours * 6.0)   / speedDifference) * speedOfTrain;
+      //Perform Modulus operation of the Intersect by 360. Ex. If value is 366, modulus would be 6. Draw 1 second hand in first loop.
+      intersectionSeconds = intersectionSeconds % 360;
+      intersectionMinutes = intersectionMinutes % 360;
+      intersectionHours   = intersectionHours % 360;
       }
       else
       {
+      
         
       }
       
-      startTime = micros();
+      DrawCoord(intersectionHours, intersectionMinutes, intersectionSeconds, int timeToDisplay)
+      
+       /*TEST
+      delay( int(timeSinceLastIR / 2.0 / 1000) );
+      digitalWrite(LED_SECONDS, HIGH);
+      //TEST*/
+
       
       Serial.print(count++);
       Serial.print(" -- Time Between Last 2 IR Senses: ");
@@ -109,13 +127,17 @@ void loop()
       Serial.println(" Degrees");    
       
       
+
+      
+      
       //Reattaches IR Interrupt
       delay(30);
       attachInterrupt(0, IR_Trigger, FALLING);
       
-      
-      
-      
+      digitalWrite(LED_STATUS, LOW);  
+      delay(30);
+     
+       digitalWrite(LED_SECONDS, LOW);
       
     }
     
