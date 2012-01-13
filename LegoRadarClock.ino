@@ -2,7 +2,7 @@
 Arduino Based Lego Train "Radar Clock"
 (C) Theodore "Waterbury" Wahrburg; 2012
 
-V.0.1.3
+V.0.1.4
 
 */
 
@@ -136,23 +136,65 @@ void loop()
       }
       
       
+
+      for(i =0; i<10; i++)
+       {
+         
+         for(j=0; j<6; j++) 
+         {
+         if (digitarray[j][2] == -1)
+          tempArray[i][0] = 360 % digitarray[i][0];
+          tempArray[i][1] = digitarray[i][1];
+          tempArray[i][2] = 0;
+          
+          i++;
+         } 
+        
+        if(intersectionSeconds <= 360)
+         {
+          tempArray[i][0] = intersectionSeconds;
+          tempArray[i][1] = 0;
+          tempArray[i][2] = 1;
+          
+          i++;          
+          
+          tempArray[i][0] = intersectionSeconds + 6;
+          tempArray[i][1] = 0;
+          if( tempArray[i][0] >360 )
+           tempArray[i][2] = -1;
+          else
+           tempArray[i][2] = 0;          
+          
+         }
+         
+               //sort de-derp
+ 
+       
+       }
+      
       if(timerTriggered)
        {
         timerTriggered =0;
+        currentDegree = digitarray[count][1];
+       }
         
-        while )( (currentDegree <= digitarray[count][1]) && (count < 6) )
+        while( (digitarray[count][1] >= currentDegree) && (count < 6) )
         {
         //draw here
-        if (digitArray[count][2] != -1)
-          digitalWrite( digitarray[count][1], digitArray[count][2] );
-        
+        if (digitArray[count][2] == 1)
+          digitalWrite( digitarray[count][1], HIGH );
+        else if (digitArray[count][2] == 0)
+          digitalWrite( digitarray[count][1], LOW );
+          
+        count++; 
+        }
         
         newDegDistance = digitArray[count-1][0] - previousDegree;
         previousDegree = digitArray[count-1][0];
               
         
         
-        count++;
+        
         
         }
          
