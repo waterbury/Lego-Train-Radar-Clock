@@ -12,15 +12,17 @@
 class TrainClock
 {
 	public:
-	
-	
-		unsigned long updateTimeRTC();
+	TrainClock();
+		//unsigned long updateTimeRTC();
 		
-		void updateLastTime();
+			
 		unsigned long getTimeSinceLast();
+		void setLastTime(unsigned long);
 		
-		struct hands getHandTimes();
-		unsigned long getTimesMillis();
+		unsigned long setTimeMillis(long);
+		long getTimeMillis();
+	//	struct hands getHandTimes();
+	//	unsigned long getTimesMillis();
 		
 		
 		
@@ -28,11 +30,11 @@ class TrainClock
 	private:
 	unsigned long _timeSinceLast;
 	unsigned long _lastTime;
+	unsigned long _millisAtLastCall;
+	unsigned long _timeAtZero;
+	//RTC_DS1307 _RTC;
 	
-
-
-
-
+	
 };
 
 
