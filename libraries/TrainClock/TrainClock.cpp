@@ -1,23 +1,23 @@
 #include "Arduino.h"
 #include "TrainClock.h"
-//#include "RTClib.h"
+#include "RTClib.h"
 
 
 
 TrainClock::TrainClock ()
 {
 _timeSinceLast = 1000000;
-_lastTime = micros();
+setLastTime();
 _millisAtLastCall = millis();
 
 setTimeMillis( millis() );
-setLastTime(micros());
+
 }
 
 
 
-void TrainClock::setLastTime(unsigned long currentTime){
-_lastTime = currentTime; 
+void TrainClock::setLastTime(){
+_lastTime = micros(); 
 }
 
 
@@ -35,11 +35,11 @@ unsigned long TrainClock::getTimeSinceLast()
 	else
 	{
 		_timeSinceLast = micros() - _lastTime;;
-		return _timeSinceLast;
+	
 	 
 	 }
 	 
-	return 0;
+	return _timeSinceLast;
 	}
 	
 
@@ -48,14 +48,14 @@ unsigned long TrainClock::getTimeSinceLast()
 long TrainClock::getTimeMillis()
 {
 
-unsigned long tmpMillis = millis();
+unsigned long long tmpMillis = millis();
 
 
-if ( _millisAtLastCall > tmpMillis + _timeAtZero )
-	setTimeMillis(    ((tmpMillis + _timeAtZero + 4294967295L + 1) % 86400000) );
+if ( _millisAtLastCall > tmpMillis ) //+ _timeAtZero )
+	setTimeMillis(    ( (tmpMillis + _timeAtZero + 4294967295LL + 1) % 86400000) );
 
 _millisAtLastCall = millis();
-long tmpOffsetTime = (tmpMillis + _timeAtZero) ^ 86400000;
+long tmpOffsetTime = (tmpMillis + _timeAtZero) % 86400000;
 
 return tmpOffsetTime;
 
@@ -64,7 +64,9 @@ return tmpOffsetTime;
 unsigned long TrainClock::setTimeMillis(long timeInMillis)
 {
 
-_timeAtZero = timeInMillis - (millis()  ^ 86400000);
+timeInMillis = timeInMillis % 86400000;
+
+_timeAtZero = timeInMillis - (millis()  % 86400000L);
 
 if (_timeAtZero < 0 )
  _timeAtZero += 86400000;
@@ -73,47 +75,35 @@ return _timeAtZero;
  
 }
 
-/*
-struct hands getTimeNow()
+void findBlipsClockwise(long currentTimeMillis)
 {
+
 
 }
-*/
 
-
-
-/*
-unsigned long TrainClock::updateTime(long timeInMillis)
+void TrainClock::bubbleSortArray (void)
 {
 
-timeIn
-
-
-		_timeAtProgramStart = ( (now.hour *60*60) + (now.minute * 60) + (now.second) );
-		_timeAtProgramStart = _timeAtProgramStart * 1000 - millis();
-
-		if (_timeAtProgramStart < 0)
+	for(int x=0; x<6; x++)
+	{
+		for(int y=0; y<5; y++)
 		{
-		_timeAtProgramStart += (86000 * 1000);
+		    //if degrees is larger than next..
+			if(blipArray[y][0]>blipArray[y+1][0])
+			{
+			    //log next degree and hand value
+				int tempDegrees = blipArray[y+1][0];
+				int tempHand = blipArray[y+1][1];
+				//set next degree value to current LARGER degree value, while moving hand value
+				blipArray[y+1][0] = blipArray[y][0];
+				blipArray[y+1][1] = blipArray[y][1];
+				//set previous next degrees value to current
+				blipArray[y][0] = tempDegrees;
+				blipArray[y][1] = tempHand;
+
+			}
 		}
 	}
-	
-	this.updateLastTime();
 
 }
-*/
-
-/*
-DateTime TrainClock::GetRTCNow() {return _RTC.now(); }
-
-
-//Starts stop watch in Micro Seconds
-void TrainClock::updateLastTime()
-{
-
-_lastTime = micros();
-
-}
-
-*/
 
