@@ -75,9 +75,56 @@ return _timeAtZero;
  
 }
 
-void findBlipsClockwise(long currentTimeMillis)
+void findBlipsClockwise(long currentTime,unsigned long speedOfTrain)
 {
+// find hours by dividing by seconds in hour. In order to make 12 hour time, must mod by 12..
+double hoursDeg = currentTime / 3600.0 % 12;
 
+// truncate hours by 1 to get decimal seconds, then multiply by 60 to get minutes
+double minutesDeg = hours % 1 * 60; 
+
+//truncate minutes by 1 to get decimal seconds, then multiply by 60 to get whole number. Truncate that value to get rational number
+int secondsDeg = int(minutes % 1 * 60);
+
+//ex.
+//83678 secs = 
+//11.243888888888888888888888888889 hours
+//14.63333333333333333333333333334 minutes
+//(38).0000000000000000000000000004 seconds
+
+hourDeg *= 30; // multiply 12 hour hours by 30 to get degree around clock
+minutesDeg *= 6; // multiply minutes by 6 to get degree around clock
+secondsDeg *= 6; // multiply seconds by 6 to get degree around clock
+
+
+//speedOfTrain is degrees per second train is moving
+
+//speedOfSecs is speed secondhand is moving per sec, ditto for speedOfMins, SpeedOfHours
+
+//6 degrees per sec
+int speedOfSecs = 6;
+//6 degrees per 60 secs (1 minute) (6/60 = .01 degree per sec)
+float speedOfMins = 0.1;
+//hours move 30 degrees per 3600 secs (1 hour) (30/3600 = 0.00833333.. degree per sec)
+double speedOfHours = 0.0083333;
+
+// (D)istance = (R)ate * (T)ime
+// Distance(Time hand was at 0) = ( speedOfTrain + speedOf[hand]) * Time
+// Time = (speedOfTrain + speedOf[hand]) / (hand position at 0)
+// Train will intersect in time found. 
+// If train is moving 180 degrees a sec and time is .5 sec, hand will intersect @ 90 degrees
+// intersection[Hand] = speedOfTrain * Time
+
+
+int intersectionSeconds = speedOfTrain * ( (speedOfTrain + speedOfSecs) / secondsDeg);
+int intersectionMinutes = speedOfTrain * ( (speedOfTrain + speedOfMins) / minutesDeg);
+int intersectionHours   = speedOfTrain * ( (speedOfTrain + speedOfHours) / hoursDeg);
+
+
+      //Perform Modulus operation of the Intersect by 360. Ex. If value is 366, modulus would be 6. Draw 1 second hand in first loop.
+      intersectionSeconds = intersectionSeconds % 360;
+      intersectionMinutes = intersectionMinutes % 360;
+      intersectionHours = intersectionHours % 360;
 
 }
 
