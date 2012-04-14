@@ -75,8 +75,13 @@ return _timeAtZero;
  
 }
 
-void findBlipsClockwise(long currentTime,unsigned long speedOfTrain)
-{
+void findBlipsCounterClockwise(unsigned long currentTimeMillis,double speedOfTrain)
+{/*
+
+//Make sure current time is no more than 86400 seconds, then divide millis by 1000 to get actual seconds
+currentTimeMillis = currentTimeMillis % 86400000;
+float currentTime = currentTimeMillis / 1000.0;
+
 // find hours by dividing by seconds in hour. In order to make 12 hour time, must mod by 12..
 double hoursDeg = currentTime / 3600.0 % 12;
 
@@ -99,14 +104,14 @@ secondsDeg *= 6; // multiply seconds by 6 to get degree around clock
 
 //speedOfTrain is degrees per second train is moving
 
-//speedOfSecs is speed secondhand is moving per sec, ditto for speedOfMins, SpeedOfHours
+//SPEED_OF_SECS is speed secondhand is moving per sec, ditto for SPEED_OF_MINS, SpeedOfHours
 
 //6 degrees per sec
-int speedOfSecs = 6;
+int SPEED_OF_SECS = 6;
 //6 degrees per 60 secs (1 minute) (6/60 = .01 degree per sec)
-float speedOfMins = 0.1;
+float SPEED_OF_MINS = 0.1;
 //hours move 30 degrees per 3600 secs (1 hour) (30/3600 = 0.00833333.. degree per sec)
-double speedOfHours = 0.0083333;
+double SPEED_OF_HOURS = 0.0083333;
 
 // (D)istance = (R)ate * (T)ime
 // Distance(Time hand was at 0) = ( speedOfTrain + speedOf[hand]) * Time
@@ -116,9 +121,9 @@ double speedOfHours = 0.0083333;
 // intersection[Hand] = speedOfTrain * Time
 
 
-int intersectionSeconds = speedOfTrain * ( (speedOfTrain + speedOfSecs) / secondsDeg);
-int intersectionMinutes = speedOfTrain * ( (speedOfTrain + speedOfMins) / minutesDeg);
-int intersectionHours   = speedOfTrain * ( (speedOfTrain + speedOfHours) / hoursDeg);
+int intersectionSeconds = int( speedOfTrain * ( (speedOfTrain + SPEED_OF_SECS) / secondsDeg) );
+int intersectionMinutes = int( speedOfTrain * ( (speedOfTrain + SPEED_OF_MINS) / minutesDeg) );
+int intersectionHours   = int( speedOfTrain * ( (speedOfTrain + SPEED_OF_HOURS) / hoursDeg) );
 
 
       //Perform Modulus operation of the Intersect by 360. Ex. If value is 366, modulus would be 6. Draw 1 second hand in first loop.
@@ -126,8 +131,121 @@ int intersectionHours   = speedOfTrain * ( (speedOfTrain + speedOfHours) / hours
       intersectionMinutes = intersectionMinutes % 360;
       intersectionHours = intersectionHours % 360;
 
-}
+*/}
 
+
+void findBlipsClockwise(unsigned long currentTimeMillis,double speedOfTrain)
+{
+int i = 0;
+int j = 0;
+
+
+//Make sure current time is no more than 86400 seconds, then divide millis by 1000 to get actual seconds
+currentTimeMillis = currentTimeMillis % 86400000;
+float currentTime = currentTimeMillis / 1000.0;
+
+// find hours by dividing by seconds in hour. In order to make 12 hour time, must mod by 12..
+double hoursDeg = currentTime / 3600.0;
+ 
+ if (hoursDeg >= 12)
+  hoursDeg -= 12;
+
+// truncate hours to get decimal seconds, then multiply by 60 to get minutes
+double minutesDeg = (hoursDeg - int(hoursDeg)) * 60; 
+
+//truncate minutes to get decimal seconds, then multiply by 60 to get whole number. Truncate that value to get rational number
+int secondsDeg = int( (minutesDeg - int(minutesDeg) ) * 60);
+
+//ex.
+//83678 secs = 
+//11.243888888888888888888888888889 hours
+//14.63333333333333333333333333334 minutes
+//(38).0000000000000000000000000004 seconds
+
+hoursDeg *= 30; // multiply 12 hour hours by 30 to get degree around clock
+minutesDeg *= 6; // multiply minutes by 6 to get degree around clock
+secondsDeg *= 6; // multiply seconds by 6 to get degree around clock
+
+
+//speedOfTrain is degrees per second train is moving
+
+//SPEED_OF_SECS is speed secondhand is moving per sec, ditto for SPEED_OF_MINS, SpeedOfHours
+
+/*
+6 degrees per sec
+	SPEED_OF_SECS = 6;
+6 degrees per 60 secs (1 minute) (6/60 = .01 degree per sec)
+	float SPEED_OF_MINS = 0.1;
+hours move 30 degrees per 3600 secs (1 hour) (30/3600 = 0.00833333.. degree per sec)
+	double SPEED_OF_HOURS = 0.0083333;
+*/
+
+// (D)istance = (R)ate * (T)ime
+// Distance(Time hand was at 0) = ( speedOfTrain - speedOf[hand]) * Time ; when solving for Time..
+// Time = (speedOfTrain - speedOf[hand]) / (distanc of hand when @ 0)
+// Train will intersect in time found. 
+// If train is moving 180 degrees a sec and time is .5 sec, hand will intersect @ 90 degrees
+// intersection[Hand] = speedOfTrain * Time
+
+
+//If SpeedOfTrain is 180 deg/sec and sec hand is @ 180 deg mark (180 *(180 / (180 - 6) ) )
+//																(180* (180 / (174) ) )
+//
+int intersection[6];
+// intersection[0] = intersectionSeconds 
+// intersection[1] = intersectionMinutes 
+// intersection[2] = intersectionHours
+//	(180* ( 1.034482~) ) = 186.20689~
+
+intersection[0] = int( speedOfTrain * (   secondsDeg / (speedOfTrain - SPEED_OF_SECS) ) );
+intersection[1] = int( speedOfTrain * (   minutesDeg / (speedOfTrain - SPEED_OF_MINS) ) );
+intersection[2]   = int( speedOfTrain * (   hoursDeg  /  (speedOfTrain - SPEED_OF_HOURS) ) );
+
+	for (i=0;i++;i<3)
+	{
+	if (intersection[i] < 360)
+	     intersection[i+3] = 360 + 6;
+	else
+		 intersection[i+3] = -1;
+	}
+
+j = 0;
+
+	for (i=0; i<6;i++)
+	{
+		
+		{
+
+			if (blipArray[i] > 360)
+				blipArray[i] % 360;
+			
+			else
+			{
+				if(j<3)
+				{
+				blipArray[i][0] = intersection[j];
+				blipArray[i][1] = j;
+				blipArray[i][2] = 1;
+				}
+				else
+				{
+				blipArray[i][0] = intersection[j];
+				blipArray[i][1] = j-3;
+				blipArray[i][2] = 0;
+				}
+				
+			
+			j++;
+			}
+			
+			
+			
+
+		}
+		
+	}
+
+}
 void TrainClock::bubbleSortArray (void)
 {
 
