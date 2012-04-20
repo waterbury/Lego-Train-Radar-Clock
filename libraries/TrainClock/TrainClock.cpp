@@ -10,6 +10,9 @@ _timeSinceLast = 1000000;
 setLastTime();
 _millisAtLastCall = millis();
 
+blipArray[0][0] = 1;
+
+
 setTimeMillis( millis() );
 
 }
@@ -134,10 +137,10 @@ int intersectionHours   = int( speedOfTrain * ( (speedOfTrain + SPEED_OF_HOURS) 
 */}
 
 
-void findBlipsClockwise(unsigned long currentTimeMillis,double speedOfTrain)
+void TrainClock::findBlipsClockwise(unsigned long currentTimeMillis, double speedOfTrain)
 {
-int i = 0;
-int j = 0;
+//int i = 0;
+//int j = 0;
 
 
 //Make sure current time is no more than 86400 seconds, then divide millis by 1000 to get actual seconds
@@ -149,12 +152,21 @@ double hoursDeg = currentTime / 3600.0;
  
  if (hoursDeg >= 12)
   hoursDeg -= 12;
+  
+//  Serial.print("hoursDeg: ");
+//Serial.println(hoursDeg);
 
 // truncate hours to get decimal seconds, then multiply by 60 to get minutes
 double minutesDeg = (hoursDeg - int(hoursDeg)) * 60; 
 
+//Serial.print("minutesDeg: ");
+//Serial.println(minutesDeg);
+
 //truncate minutes to get decimal seconds, then multiply by 60 to get whole number. Truncate that value to get rational number
 int secondsDeg = int( (minutesDeg - int(minutesDeg) ) * 60);
+
+//Serial.print("secondsDeg: ");
+//Serial.println(secondsDeg);
 
 //ex.
 //83678 secs = 
@@ -162,9 +174,28 @@ int secondsDeg = int( (minutesDeg - int(minutesDeg) ) * 60);
 //14.63333333333333333333333333334 minutes
 //(38).0000000000000000000000000004 seconds
 
+hoursDeg = 0;
+minutesDeg = 0;
+secondsDeg = 30;
+
 hoursDeg *= 30; // multiply 12 hour hours by 30 to get degree around clock
 minutesDeg *= 6; // multiply minutes by 6 to get degree around clock
 secondsDeg *= 6; // multiply seconds by 6 to get degree around clock
+
+/*
+hoursDeg -= OFFSET;
+if( hoursDeg <0)
+hoursDeg += 360;
+
+minutesDeg -= OFFSET;
+if( minutesDeg <0)
+minutesDeg += 360;
+
+
+secondsDeg -= OFFSET;
+if( secondsDeg <0)
+secondsDeg += 360;
+*/
 
 
 //speedOfTrain is degrees per second train is moving
@@ -191,103 +222,135 @@ hours move 30 degrees per 3600 secs (1 hour) (30/3600 = 0.00833333.. degree per 
 //If SpeedOfTrain is 180 deg/sec and sec hand is @ 180 deg mark (180 *(180 / (180 - 6) ) )
 //																(180* (180 / (174) ) )
 //
-int intersection[6];
-// intersection[0] = intersectionSeconds 
-// intersection[1] = intersectionMinutes 
-// intersection[2] = intersectionHours
+
+
+
+// intersection[0] = intersectionSeconds; Turn on @ this degree
+// intersection[1] = intersectionMinutes; Turn on @ this degree 
+// intersection[2] = intersectionHours; Turn on @ this degree
 //	(180* ( 1.034482~) ) = 186.20689~
 
-intersection[0] = int( speedOfTrain * (   secondsDeg / (speedOfTrain - SPEED_OF_SECS) ) );
-intersection[1] = int( speedOfTrain * (   minutesDeg / (speedOfTrain - SPEED_OF_MINS) ) );
-intersection[2]   = int( speedOfTrain * (   hoursDeg  /  (speedOfTrain - SPEED_OF_HOURS) ) );
+double blah = ( speedOfTrain * ( secondsDeg / (speedOfTrain - SPEED_OF_SECS) ) );
+Serial.println(blah);
+
+blipArray[0][0] = int(blah); //speedOfTrain * ( secondsDeg / (speedOfTrain - SPEED_OF_SECS) ) );
+blipArray[0][1] = 0;
+blipArray[0][2] = 1;
+
+blipArray[1][0] = int( speedOfTrain * ( minutesDeg / (speedOfTrain - SPEED_OF_MINS) ) );
+blipArray[1][1] = 1;
+blipArray[1][2] = 1;
 
 
-secondsDeg += Drawlength;
+blipArray[2][0] = int( speedOfTrain * ( hoursDeg / (speedOfTrain - SPEED_OF_HOURS) ) );
+blipArray[2][1] = 2;
+blipArray[2][2] = 1;
+
+
+secondsDeg += DRAWLENGTH;
 if (secondsDeg >= 360)
  secondsDeg -= 360;
 
-minutesDeg += Drawlength;
+minutesDeg += DRAWLENGTH;
 if (minutesDeg >= 360)
- secondsDeg -= 360;
+ minutesDeg -= 360;
 
-hoursDeg += Drawlength;
+hoursDeg += DRAWLENGTH;
 if (hoursDeg >= 360)
- secondsDeg -= 360;
+ hoursDeg -= 360;
+
+// intersection[3] = intersectionSeconds; Turn off @ this degree
+// intersection[4] = intersectionMinutes; Turn off @ this degree 
+// intersection[5] = intersectionHours; Turn off @ this degree
 
 
-intersection[3] = int( speedOfTrain * ( secondsDeg / (speedOfTrain - SPEED_OF_SECS) ) );
-intersection[4] = int( speedOfTrain * ( minutesDeg / (speedOfTrain - SPEED_OF_MINS) ) );
-intersection[5] = int( speedOfTrain * ( hoursDeg / (speedOfTrain - SPEED_OF_HOURS) ) );
+
+blah = ( speedOfTrain * ( secondsDeg / (speedOfTrain - SPEED_OF_SECS) ) );
+Serial.println(blah);
+
+blipArray[3][0] = int( blah);// speedOfTrain * ( secondsDeg / (speedOfTrain - SPEED_OF_SECS))   ); //int( speedOfTrain * ( secondsDeg / (speedOfTrain - SPEED_OF_SECS) ) );
+blipArray[3][1] = 0;//0 = sec
+blipArray[3][2] = 0;//off
 
 
-	for (i=0;i++;i<3)
-	{
-	if (intersection[i] < 360)
-	     intersection[i+3] = 360 + 6;
-	else
-		 intersection[i+3] = -1;
-	}
+blipArray[4][0] = int( speedOfTrain * ( minutesDeg / (speedOfTrain - SPEED_OF_MINS) ) );
+blipArray[4][1] = 1;//1 = min
+blipArray[4][2] = 0;//off
 
-j = 0;
+blipArray[5][0] = int( speedOfTrain * ( hoursDeg / (speedOfTrain - SPEED_OF_HOURS) ) );
+blipArray[5][1] = 2;//2 = hours
+blipArray[5][2] = 0;//off
 
-	for (i=0; i<6;i++)
-	{
-		
-		{
 
-			if (blipArray[i] > 360)
-				blipArray[i] % 360;
-			
-			else
-			{
-				if(j<3)
-				{
-				blipArray[i][0] = intersection[j];
-				blipArray[i][1] = j;
-				blipArray[i][2] = 1;
-				}
-				else
-				{
-				blipArray[i][0] = intersection[j];
-				blipArray[i][1] = j-3;
-				blipArray[i][2] = 0;
-				}
-				
-			
-			j++;
-			}
-			
-			
-			
+bubbleSortArray();
 
-		}
-		
-	}
 
 }
+
 void TrainClock::bubbleSortArray (void)
 {
+int tempDegrees = 0;
+int tempHand = 0;
+int tempSwitch = 0;
+int x;
 
-	for(int x=0; x<6; x++)
+	for( x=0; x<6; x++)
 	{
-		for(int y=0; y<5; y++)
+//	
+	for(int y=0; y<5; y++)
 		{
 		    //if degrees is larger than next..
 			if(blipArray[y][0]>blipArray[y+1][0])
 			{
 			    //log next degree and hand value
-				int tempDegrees = blipArray[y+1][0];
-				int tempHand = blipArray[y+1][1];
+				tempDegrees = blipArray[y+1][0];
+				tempHand = blipArray[y+1][1];
+				tempSwitch = blipArray[y+1][2];
 				//set next degree value to current LARGER degree value, while moving hand value
 				blipArray[y+1][0] = blipArray[y][0];
 				blipArray[y+1][1] = blipArray[y][1];
+				blipArray[y+1][2] = blipArray[y][2];
 				//set previous next degrees value to current
 				blipArray[y][0] = tempDegrees;
 				blipArray[y][1] = tempHand;
-
+				blipArray[y][2] = tempSwitch;
 			}
 		}
 	}
 
+	/*for(x=0;x<6;x++)
+	 {
+	 Serial.print(blipArray[x][0]);
+	 Serial.print(" - ");
+	 Serial.print(blipArray[x][1]);
+	 Serial.print(" - ");
+	 Serial.println(blipArray[x][2]);
+	 
+	}*/
 }
+
+int TrainClock::getBlipArray(int i, int j)
+{
+
+
+if(i<6 && i>=0)
+	if (j<6 && j>=0)
+		return blipArray[i][j];
+		
+		
+return 0;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
