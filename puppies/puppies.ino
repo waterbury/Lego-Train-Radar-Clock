@@ -113,8 +113,8 @@ void loop()
         
         //Speed of train is determined by dividing the 360 degrees of the track circle by the time taken.
         speedOfTrain = 90;//360/ (train.getTimeSinceLast()/1000000.0);
-        Serial.print("speedOfTrain: ");
-        Serial.println(speedOfTrain);
+    //    Serial.print("speedOfTrain: ");
+      //  Serial.println(speedOfTrain);
         
         train.setLastTime();
         digitalWrite(LED_STATUS, HIGH);   
@@ -122,7 +122,7 @@ void loop()
         if ( digitalRead(CLOCKWISE_DETECT) == HIGH)
         {
        //   digitalWrite(LED_HOURS,1);
-          train.findBlipsClockwise( 30 /*train.getTimeMillis()*/, speedOfTrain );
+          train.findBlipsClockwise( train.getTimeMillis(), speedOfTrain );
         //  digitalWrite(LED_MINUTES,1);
         }
         else
@@ -136,11 +136,11 @@ void loop()
      }
      
      if (count<6)
-       if ( int(speedOfTrain * (train.getTimeSinceLast() /1000000) )  >= (train.getBlipArray(count,0) )  )
+       if ( int(speedOfTrain / 1000000.0 * (train.getTimeSinceLast() ) )  >= (train.getBlipArray(count,0) )  )
         {
           Serial.print("count: ");
           Serial.println (count);
-          Serial.println ( int(speedOfTrain * (train.getTimeSinceLast() /1000000) ) );
+          Serial.println ( int(speedOfTrain /1000000.0 * (train.getTimeSinceLast() ) ) );
           
           
           if ( train.getBlipArray(count,0) <=360)
