@@ -144,29 +144,34 @@ void TrainClock::findBlipsClockwise(unsigned long currentTimeMillis, double spee
 
 
 //Make sure current time is no more than 86400 seconds, then divide millis by 1000 to get actual seconds
-currentTimeMillis = currentTimeMillis % 86400000;
+currentTimeMillis = currentTimeMillis % 43200000;
 float currentTime = currentTimeMillis / 1000.0;
+
+Serial.print("currentTime: ");
+Serial.println(currentTime);
+
+
 
 // find hours by dividing by seconds in hour. In order to make 12 hour time, must mod by 12..
 double hoursDeg = currentTime / 3600.0;
  
- if (hoursDeg >= 12)
-  hoursDeg -= 12;
+// if (hoursDeg >= 12)
+  //hoursDeg -= 12;
   
-//  Serial.print("hoursDeg: ");
-//Serial.println(hoursDeg);
+Serial.print("hoursDeg: ");
+Serial.println(hoursDeg);
 
 // truncate hours to get decimal seconds, then multiply by 60 to get minutes
 double minutesDeg = (hoursDeg - int(hoursDeg)) * 60; 
 
-//Serial.print("minutesDeg: ");
-//Serial.println(minutesDeg);
+Serial.print("minutesDeg: ");
+Serial.println(minutesDeg);
 
 //truncate minutes to get decimal seconds, then multiply by 60 to get whole number. Truncate that value to get rational number
 int secondsDeg = int( (minutesDeg - int(minutesDeg) ) * 60);
 
-//Serial.print("secondsDeg: ");
-//Serial.println(secondsDeg);
+Serial.print("secondsDeg: ");
+Serial.println(secondsDeg);
 
 //ex.
 //83678 secs = 
@@ -174,9 +179,9 @@ int secondsDeg = int( (minutesDeg - int(minutesDeg) ) * 60);
 //14.63333333333333333333333333334 minutes
 //(38).0000000000000000000000000004 seconds
 
-hoursDeg = 0;
-minutesDeg = 0;
-secondsDeg = 30;
+//hoursDeg = 0;
+//minutesDeg = 0;
+//secondsDeg = 30;
 
 hoursDeg *= 30; // multiply 12 hour hours by 30 to get degree around clock
 minutesDeg *= 6; // multiply minutes by 6 to get degree around clock

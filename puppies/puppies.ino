@@ -64,7 +64,7 @@ void setup() {
 
 
 
-train.setTimeMillis(63200);
+train.setTimeMillis(63200000);
 train.setLastTime();
 
   //Sets up LED pins to output
