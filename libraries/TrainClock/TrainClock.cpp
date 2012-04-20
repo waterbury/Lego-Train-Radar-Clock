@@ -201,6 +201,25 @@ intersection[0] = int( speedOfTrain * (   secondsDeg / (speedOfTrain - SPEED_OF_
 intersection[1] = int( speedOfTrain * (   minutesDeg / (speedOfTrain - SPEED_OF_MINS) ) );
 intersection[2]   = int( speedOfTrain * (   hoursDeg  /  (speedOfTrain - SPEED_OF_HOURS) ) );
 
+
+secondsDeg += Drawlength;
+if (secondsDeg >= 360)
+ secondsDeg -= 360;
+
+minutesDeg += Drawlength;
+if (minutesDeg >= 360)
+ secondsDeg -= 360;
+
+hoursDeg += Drawlength;
+if (hoursDeg >= 360)
+ secondsDeg -= 360;
+
+
+intersection[3] = int( speedOfTrain * ( secondsDeg / (speedOfTrain - SPEED_OF_SECS) ) );
+intersection[4] = int( speedOfTrain * ( minutesDeg / (speedOfTrain - SPEED_OF_MINS) ) );
+intersection[5] = int( speedOfTrain * ( hoursDeg / (speedOfTrain - SPEED_OF_HOURS) ) );
+
+
 	for (i=0;i++;i<3)
 	{
 	if (intersection[i] < 360)
