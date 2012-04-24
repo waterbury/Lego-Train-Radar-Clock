@@ -114,20 +114,25 @@ void loop()
 			speedOfTrain = 360/ (train.getTimeSinceLast()/1000000.0);
 			
 			train.setLastTime();
-			digitalWrite(LED_STATUS, HIGH);   
+
 			
 			//If train is moving clockwise, CLOCKWISE_DETECT will be HIGH, else if counter-clockwise pin will be LOW
 			if ( digitalRead(CLOCKWISE_DETECT) == HIGH)
 			{
 				train.findBlipsClockwise( train.getTimeMillis(), speedOfTrain );
+				count = 0;
+			digitalWrite(LED_STATUS, HIGH);   
 			}
 			else
 			{
 				train.findBlipsCounterClockwise( train.getTimeMillis(), speedOfTrain );
+				count = 5;
+
+			digitalWrite(LED_STATUS, LOW);   
 			}
 			
 
-			count = 0;
+			
 
 		}
 	}
@@ -163,7 +168,7 @@ void loop()
 	else
 	{
 		if (count >= 0)
-		if ( 360 - int(speedOfTrain/1000000.0*(train.getTimeSinceLast())) )   <= (train.getBlipArray(count,0) )  )
+		if ( (360 - int(speedOfTrain/1000000.0*(train.getTimeSinceLast())) )   <= (train.getBlipArray(count,0) )  )
 		{
 			
 			if ( train.getBlipArray(count,0) >=0)
@@ -171,7 +176,7 @@ void loop()
 				drawHand(train.getBlipArray(count,1), train.getBlipArray(count,2) );
 			}			
 			
-			count--;
+			count = count - 1;
 			
 		}
 		

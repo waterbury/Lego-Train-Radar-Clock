@@ -78,100 +78,22 @@ unsigned long TrainClock::setTimeMillis(long timeInMillis)
 
 }
 
-void findBlipsCounterClockwise(unsigned long currentTimeMillis,double speedOfTrain)
-{/*
-
-//Make sure current time is no more than 86400 seconds, then divide millis by 1000 to get actual seconds
-currentTimeMillis = currentTimeMillis % 86400000;
-float currentTime = currentTimeMillis / 1000.0;
-
-// find hours by dividing by seconds in hour. In order to make 12 hour time, must mod by 12..
-double hoursDeg = currentTime / 3600.0 % 12;
-
-// truncate hours by 1 to get decimal seconds, then multiply by 60 to get minutes
-double minutesDeg = hours % 1 * 60; 
-
-//truncate minutes by 1 to get decimal seconds, then multiply by 60 to get whole number. Truncate that value to get rational number
-int secondsDeg = int(minutes % 1 * 60);
-
-//ex.
-//83678 secs = 
-//11.243888888888888888888888888889 hours
-//14.63333333333333333333333333334 minutes
-//(38).0000000000000000000000000004 seconds
-
-hourDeg *= 30; // multiply 12 hour hours by 30 to get degree around clock
-minutesDeg *= 6; // multiply minutes by 6 to get degree around clock
-secondsDeg *= 6; // multiply seconds by 6 to get degree around clock
-
-
-//speedOfTrain is degrees per second train is moving
-
-//SPEED_OF_SECS is speed secondhand is moving per sec, ditto for SPEED_OF_MINS, SpeedOfHours
-
-//6 degrees per sec
-int SPEED_OF_SECS = 6;
-//6 degrees per 60 secs (1 minute) (6/60 = .01 degree per sec)
-float SPEED_OF_MINS = 0.1;
-//hours move 30 degrees per 3600 secs (1 hour) (30/3600 = 0.00833333.. degree per sec)
-double SPEED_OF_HOURS = 0.0083333;
-
-// (D)istance = (R)ate * (T)ime
-// Distance(Time hand was at 0) = ( speedOfTrain + speedOf[hand]) * Time
-// Time = (speedOfTrain + speedOf[hand]) / (hand position at 0)
-// Train will intersect in time found. 
-// If train is moving 180 degrees a sec and time is .5 sec, hand will intersect @ 90 degrees
-// intersection[Hand] = speedOfTrain * Time
-
-
-int intersectionSeconds = int( speedOfTrain * ( (speedOfTrain + SPEED_OF_SECS) / secondsDeg) );
-int intersectionMinutes = int( speedOfTrain * ( (speedOfTrain + SPEED_OF_MINS) / minutesDeg) );
-int intersectionHours   = int( speedOfTrain * ( (speedOfTrain + SPEED_OF_HOURS) / hoursDeg) );
-
-
-	//Perform Modulus operation of the Intersect by 360. Ex. If value is 366, modulus would be 6. Draw 1 second hand in first loop.
-	intersectionSeconds = intersectionSeconds % 360;
-	intersectionMinutes = intersectionMinutes % 360;
-	intersectionHours = intersectionHours % 360;
-
-*/}
-
-
-void TrainClock::findBlipsClockwise(unsigned long currentTimeMillis, double speedOfTrain)
+void TrainClock::findBlipsCounterClockwise(unsigned long currentTimeMillis,double speedOfTrain)
 {
-	//int i = 0;
-	//int j = 0;
-
-
+	
 	//Make sure current time is no more than 43300 seconds for 12 hour time, then divide millis by 1000 to get actual seconds
 	currentTimeMillis = currentTimeMillis % 43200000;
 	float currentTime = currentTimeMillis / 1000.0;
 
-	Serial.print("currentTime: ");
-	Serial.println(currentTime);
-
-
-
+	
 	// find hours by dividing by seconds in hour. In order to make 12 hour time, must mod by 12..
 	double hoursDeg = currentTime / 3600.0;
-
-	// if (hoursDeg >= 12)
-	//hoursDeg -= 12;
-
-	Serial.print("hoursDeg: ");
-	Serial.println(hoursDeg);
 
 	// truncate hours to get decimal seconds, then multiply by 60 to get minutes
 	double minutesDeg = (hoursDeg - int(hoursDeg)) * 60; 
 
-	Serial.print("minutesDeg: ");
-	Serial.println(minutesDeg);
-
 	//truncate minutes to get decimal seconds, then multiply by 60 to get whole number. Truncate that value to get rational number
 	int secondsDeg = int( (minutesDeg - int(minutesDeg) ) * 60);
-
-	Serial.print("secondsDeg: ");
-	Serial.println(secondsDeg);
 
 	//ex.
 	//83678 secs = 
@@ -179,9 +101,80 @@ void TrainClock::findBlipsClockwise(unsigned long currentTimeMillis, double spee
 	//14.63333333333333333333333333334 minutes
 	//(38).0000000000000000000000000004 seconds
 
-	//hoursDeg = 0;
-	//minutesDeg = 0;
-	//secondsDeg = 30;
+	hoursDeg *= 30; // multiply 12 hour hours by 30 to get degree around clock
+	minutesDeg *= 6; // multiply minutes by 6 to get degree around clock
+	secondsDeg *= 6; // multiply seconds by 6 to get degree around clock
+
+	
+	blipArray[0][0] = 360 - int(speedOfTrain * ( secondsDeg / (speedOfTrain + SPEED_OF_SECS) ) );
+	blipArray[0][1] = 0;
+	blipArray[0][2] = 1;
+
+	blipArray[1][0] = 360 - int( speedOfTrain * ( minutesDeg / (speedOfTrain + SPEED_OF_MINS) ) );
+	blipArray[1][1] = 1;
+	blipArray[1][2] = 1;
+
+
+	blipArray[2][0] =  360 - int( speedOfTrain * ( hoursDeg / (speedOfTrain + SPEED_OF_HOURS) ) );
+	blipArray[2][1] = 2;
+	blipArray[2][2] = 1;
+
+
+	secondsDeg -= DRAWLENGTH;
+	if (secondsDeg <= 0)
+	secondsDeg += 360;
+
+	minutesDeg -= DRAWLENGTH;
+	if (minutesDeg <= 0)
+	minutesDeg += 360;
+
+	hoursDeg -= DRAWLENGTH;
+	if (hoursDeg <= 0)
+	hoursDeg += 360;
+
+
+	blipArray[3][0] = 360 - int( speedOfTrain * ( secondsDeg / (speedOfTrain + SPEED_OF_SECS))   );
+	blipArray[3][1] = 0;//0 = sec
+	blipArray[3][2] = 0;//off
+
+
+	blipArray[4][0] = 360 - int( speedOfTrain * ( minutesDeg / (speedOfTrain + SPEED_OF_MINS) ) );
+	blipArray[4][1] = 1;//1 = min
+	blipArray[4][2] = 0;//off
+
+	blipArray[5][0] = 360 - int( speedOfTrain * ( hoursDeg / (speedOfTrain + SPEED_OF_HOURS) ) );
+	blipArray[5][1] = 2;//2 = hours
+	blipArray[5][2] = 0;//off
+
+
+	bubbleSortArray();
+	
+
+}
+
+
+void TrainClock::findBlipsClockwise(unsigned long currentTimeMillis, double speedOfTrain)
+{
+	
+	//Make sure current time is no more than 43300 seconds for 12 hour time, then divide millis by 1000 to get actual seconds
+	currentTimeMillis = currentTimeMillis % 43200000;
+	float currentTime = currentTimeMillis / 1000.0;
+
+	
+	// find hours by dividing by seconds in hour. In order to make 12 hour time, must mod by 12..
+	double hoursDeg = currentTime / 3600.0;
+
+	// truncate hours to get decimal seconds, then multiply by 60 to get minutes
+	double minutesDeg = (hoursDeg - int(hoursDeg)) * 60; 
+
+	//truncate minutes to get decimal seconds, then multiply by 60 to get whole number. Truncate that value to get rational number
+	int secondsDeg = int( (minutesDeg - int(minutesDeg) ) * 60);
+
+	//ex.
+	//83678 secs = 
+	//11.243888888888888888888888888889 hours
+	//14.63333333333333333333333333334 minutes
+	//(38).0000000000000000000000000004 seconds
 
 	hoursDeg *= 30; // multiply 12 hour hours by 30 to get degree around clock
 	minutesDeg *= 6; // multiply minutes by 6 to get degree around clock

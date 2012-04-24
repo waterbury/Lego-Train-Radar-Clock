@@ -37,7 +37,7 @@ class TrainClock
 		unsigned long setTimeMillis(long);
 		long getTimeMillis();
 		
-		void findBlipsCounterClockwise(unsigned long, unsigned long);
+		void findBlipsCounterClockwise(unsigned long, double);
 		void findBlipsClockwise(unsigned long, double);
 		
 		void bubbleSortArray (void);
