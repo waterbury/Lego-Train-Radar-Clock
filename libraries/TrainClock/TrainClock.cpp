@@ -106,16 +106,16 @@ void TrainClock::findBlipsCounterClockwise(unsigned long currentTimeMillis,doubl
 	secondsDeg *= 6; // multiply seconds by 6 to get degree around clock
 
 	
-	blipArray[0][0] = 360 - int(speedOfTrain * ( secondsDeg / (speedOfTrain + SPEED_OF_SECS) ) );
+	blipArray[0][0] = 360 - int(speedOfTrain * ( (360 - secondsDeg) / (speedOfTrain + SPEED_OF_SECS) ) );
 	blipArray[0][1] = 0;
 	blipArray[0][2] = 1;
 
-	blipArray[1][0] = 360 - int( speedOfTrain * ( minutesDeg / (speedOfTrain + SPEED_OF_MINS) ) );
+	blipArray[1][0] = 360 - int( speedOfTrain * ( (360 - minutesDeg) / (speedOfTrain + SPEED_OF_MINS) ) );
 	blipArray[1][1] = 1;
 	blipArray[1][2] = 1;
 
 
-	blipArray[2][0] =  360 - int( speedOfTrain * ( hoursDeg / (speedOfTrain + SPEED_OF_HOURS) ) );
+	blipArray[2][0] =  360 - int( speedOfTrain * ( (360 - hoursDeg) / (speedOfTrain + SPEED_OF_HOURS) ) );
 	blipArray[2][1] = 2;
 	blipArray[2][2] = 1;
 
@@ -133,16 +133,16 @@ void TrainClock::findBlipsCounterClockwise(unsigned long currentTimeMillis,doubl
 	hoursDeg += 360;
 
 
-	blipArray[3][0] = 360 - int( speedOfTrain * ( secondsDeg / (speedOfTrain + SPEED_OF_SECS))   );
+	blipArray[3][0] = 360 - int( speedOfTrain * ( (360 - secondsDeg) / (speedOfTrain + SPEED_OF_SECS))   );
 	blipArray[3][1] = 0;//0 = sec
 	blipArray[3][2] = 0;//off
 
 
-	blipArray[4][0] = 360 - int( speedOfTrain * ( minutesDeg / (speedOfTrain + SPEED_OF_MINS) ) );
+	blipArray[4][0] = 360 - int( speedOfTrain * ( (360 - minutesDeg) / (speedOfTrain + SPEED_OF_MINS) ) );
 	blipArray[4][1] = 1;//1 = min
 	blipArray[4][2] = 0;//off
 
-	blipArray[5][0] = 360 - int( speedOfTrain * ( hoursDeg / (speedOfTrain + SPEED_OF_HOURS) ) );
+	blipArray[5][0] = 360 - int( speedOfTrain * ( (360 - hoursDeg) / (speedOfTrain + SPEED_OF_HOURS) ) );
 	blipArray[5][1] = 2;//2 = hours
 	blipArray[5][2] = 0;//off
 
@@ -339,6 +339,7 @@ int TrainClock::getBlipArray(int i, int j)
 	return 0;
 
 }
+
 
 
 

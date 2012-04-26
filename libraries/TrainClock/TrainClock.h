@@ -17,7 +17,7 @@ const float SPEED_OF_MINS = 0.1;
 //hours move 30 degrees per 3600 secs (1 hour) (30/3600 = 0.00833333.. degree per sec)
 const double SPEED_OF_HOURS = 0.0083333;
 
-const int DRAWLENGTH = 30;
+const int DRAWLENGTH = 10;
 const int OFFSET = int(DRAWLENGTH / 2);
 
 

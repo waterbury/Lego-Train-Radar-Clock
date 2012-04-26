@@ -55,16 +55,20 @@ timerTriggered = 1;
 
 TrainClock train;
 
-
+int isClockwise = 1;
 
 void setup() {
 
-
 	Serial.begin(9600);
 
+	pinMode(CLOCKWISE_DETECT, INPUT); // set pin to detect whether train is moving clockwise to input
+	digitalWrite(CLOCKWISE_DETECT, HIGH); // turn on pullup resistor for PIN. If High, train is moving clockwise
+ 
+    delay(1500);
+	isClockwise = digitalRead(CLOCKWISE_DETECT);
 
 
-	train.setTimeMillis(63200000);
+	train.setTimeMillis(63202000);
 	train.setLastTime();
 
 	//Sets up LED pins to output
@@ -75,8 +79,6 @@ void setup() {
 	//Sets Up IR Pin as input, for interrupt
 	pinMode(IR_PIN, INPUT);
 
-	pinMode(CLOCKWISE_DETECT, INPUT); // set pin to detect whether train is moving clockwise to input
-	digitalWrite(CLOCKWISE_DETECT, HIGH); // turn on pullup resistor for PIN. If High, train is moving clockwise
 
 	//Sets up IR PIN to Interrupt Microcontroller as IR Detector pulls pin low
 	attachInterrupt(0, IR_Trigger, FALLING);
@@ -117,15 +119,15 @@ void loop()
 
 			
 			//If train is moving clockwise, CLOCKWISE_DETECT will be HIGH, else if counter-clockwise pin will be LOW
-			if ( digitalRead(CLOCKWISE_DETECT) == HIGH)
+			if (isClockwise)
 			{
-				train.findBlipsClockwise( train.getTimeMillis(), speedOfTrain );
+				train.findBlipsClockwise( /*34252000*/ train.getTimeMillis(), speedOfTrain );
 				count = 0;
 			digitalWrite(LED_STATUS, HIGH);   
 			}
 			else
 			{
-				train.findBlipsCounterClockwise( train.getTimeMillis(), speedOfTrain );
+				train.findBlipsCounterClockwise( /*34252000*/ train.getTimeMillis(), speedOfTrain );
 				count = 5;
 
 			digitalWrite(LED_STATUS, LOW);   
@@ -138,7 +140,7 @@ void loop()
 	}
 	
 	
-	if ( digitalRead(CLOCKWISE_DETECT) == HIGH)
+	if (isClockwise)
 	{
 		if (count<6)
 		if ( int(speedOfTrain / 1000000.0 * (train.getTimeSinceLast() ) )  >= (train.getBlipArray(count,0) )  )
