@@ -2,33 +2,20 @@
 #include "TrainClock.h"
 #include "RTClib.h"
 
-
-
 TrainClock::TrainClock ()
 {
 	_timeSinceLast = 1000000;
 	setLastTime();
 	_millisAtLastCall = millis();
-
-	blipArray[0][0] = 1;
-
-
 	setTimeMillis( millis() );
-
 }
 
-
-
-void TrainClock::setLastTime(){
-	_lastTime = micros(); 
-}
-
+void TrainClock::setLastTime(){ _lastTime = micros(); }
 
 
 //Finds time since stop watch began. Should be able to measure up about 71 minutes in length, else results will overflow back to zero
 unsigned long TrainClock::getTimeSinceLast()
 {
-	
 	//Micros is a 32-bit value,  Arduino Atmega8 series chips overflow Micros() after a little over 71 minutes.
 	//If overflowed to zero, add 32-bit max to current micros and subtract previous value
 	if (micros() < _lastTime)
@@ -38,8 +25,6 @@ unsigned long TrainClock::getTimeSinceLast()
 	else
 	{
 		_timeSinceLast = micros() - _lastTime;;
-		
-		
 	}
 	
 	return _timeSinceLast;
@@ -50,9 +35,7 @@ unsigned long TrainClock::getTimeSinceLast()
 
 long TrainClock::getTimeMillis()
 {
-
 	unsigned long long tmpMillis = millis();
-
 
 	if ( _millisAtLastCall > tmpMillis ) //+ _timeAtZero )
 	setTimeMillis(    ( (tmpMillis + _timeAtZero + 4294967295LL + 1) % 86400000) );
@@ -331,29 +314,15 @@ void TrainClock::bubbleSortArray (void)
 			}
 		}
 	}
-
-	/*for(x=0;x<6;x++)
-	{
-	Serial.print(blipArray[x][0]);
-	Serial.print(" - ");
-	Serial.print(blipArray[x][1]);
-	Serial.print(" - ");
-	Serial.println(blipArray[x][2]);
-	
-	}*/
 }
 
 int TrainClock::getBlipArray(int i, int j)
 {
-
-
 	if(i<6 && i>=0)
 	if (j<6 && j>=0)
 	return blipArray[i][j];
 	
-	
 	return 0;
-
 }
 
 
