@@ -106,6 +106,22 @@ void TrainClock::findBlipsCounterClockwise(unsigned long currentTimeMillis,doubl
 	secondsDeg *= 6; // multiply seconds by 6 to get degree around clock
 
 	
+hoursDeg += OFFSET;
+if( hoursDeg >360)
+hoursDeg -= 360;
+
+minutesDeg += OFFSET;
+if( minutesDeg >360)
+minutesDeg -= 360;
+
+
+secondsDeg += OFFSET;
+if( secondsDeg >360)
+secondsDeg -= 360;
+	
+	
+	
+	
 	blipArray[0][0] = 360 - int(speedOfTrain * ( (360 - secondsDeg) / (speedOfTrain + SPEED_OF_SECS) ) );
 	blipArray[0][1] = 0;
 	blipArray[0][2] = 1;
@@ -180,7 +196,7 @@ void TrainClock::findBlipsClockwise(unsigned long currentTimeMillis, double spee
 	minutesDeg *= 6; // multiply minutes by 6 to get degree around clock
 	secondsDeg *= 6; // multiply seconds by 6 to get degree around clock
 
-	/*
+	
 hoursDeg -= OFFSET;
 if( hoursDeg <0)
 hoursDeg += 360;
@@ -193,7 +209,7 @@ minutesDeg += 360;
 secondsDeg -= OFFSET;
 if( secondsDeg <0)
 secondsDeg += 360;
-*/
+
 
 
 	//speedOfTrain is degrees per second train is moving

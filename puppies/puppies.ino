@@ -1,4 +1,6 @@
 
+
+
 /*
 Arduino Based Lego Train "Radar Clock"
 (C) Theodore "Waterbury" Wahrburg; 2012
@@ -7,10 +9,17 @@ V.0.1.4
 
 */
 
+//#define DS1307_CTRL_ID 0x68 
+
 #include <Wire.h>
 #include <SPI.h>
 #include <RTClib.h>
+//#include <DS1307RTC.h>
 #include "TrainClock.h"
+
+
+
+
 
 
 //define what pins trigger which LEDs
@@ -23,21 +32,16 @@ V.0.1.4
 #define  IR_PIN      2
 
 //define which pin detects for the direction of the train. Whether it is running clockwise, or counter-clockwise
-#define CLOCKWISE_DETECT 19
+#define CLOCKWISE_DETECT 12
 
 
 //Indicates If IR Iterrupt Occured
 volatile int IR_Triggered = 0;
 
 double speedOfTrain = 0;  
-
 float speedDifference = 0;
-
-
 int count = 0;
-
-
-
+RTC_DS1307 RTC;
 
 //Function for Infrared LED Interrupt
 void IR_Trigger()
@@ -46,12 +50,6 @@ void IR_Trigger()
 
 }
 
-/*
-void drawTimer()
-{
-timerTriggered = 1;
-}
-*/
 
 TrainClock train;
 
@@ -63,12 +61,26 @@ void setup() {
 
 	pinMode(CLOCKWISE_DETECT, INPUT); // set pin to detect whether train is moving clockwise to input
 	digitalWrite(CLOCKWISE_DETECT, HIGH); // turn on pullup resistor for PIN. If High, train is moving clockwise
+	train.setTimeMillis(63202000);
+
+    Wire.begin();
+    RTC.begin();
+   
+     if (! RTC.isrunning()) {
+    Serial.println("RTC is NOT running!");
+    // following line sets the RTC to the date & time this sketch was compiled
+    RTC.adjust(DateTime(__DATE__, __TIME__));
+  }
+ train.setTimeMillis( (RTC.now().unixtime() % 86400 ) * 1000 );
+  
+
  
     delay(1500);
 	isClockwise = digitalRead(CLOCKWISE_DETECT);
 
 
-	train.setTimeMillis(63202000);
+//	train.setTimeMillis(63202000);
+	//train.setTimeMillis(RTC.unixtime() % 86400 * 1000);
 	train.setLastTime();
 
 	//Sets up LED pins to output
@@ -105,9 +117,9 @@ void loop()
 		//Detaches IR Interrupt
 		//detachInterrupt(0);
 		IR_Triggered = 0;
-		digitalWrite(LED_STATUS, LOW);
+		//digitalWrite(LED_STATUS, LOW);
 		
-		if( train.getTimeSinceLast() > 1500000)
+		if( train.getTimeSinceLast() > 500000)
 		{
 			
 			//    printTime();
@@ -119,13 +131,13 @@ void loop()
 
 			
 			//If train is moving clockwise, CLOCKWISE_DETECT will be HIGH, else if counter-clockwise pin will be LOW
-			if (isClockwise)
+			if (isClockwise == 1)
 			{
 				train.findBlipsClockwise( /*34252000*/ train.getTimeMillis(), speedOfTrain );
 				count = 0;
 			digitalWrite(LED_STATUS, HIGH);   
 			}
-			else
+			else if (isClockwise == 0)
 			{
 				train.findBlipsCounterClockwise( /*34252000*/ train.getTimeMillis(), speedOfTrain );
 				count = 5;
