@@ -2,7 +2,7 @@
 
 Arduino installed on Lego Train. Uses track to power Arduino. 
 
- - Uses IR LED at 12:00 mark to measure speed.
+ - Uses IR LED at 12:00 mark to measure speed, and to calibrate hom.
  - Uses voltage sensing on Rail to sense change in direction.
  
  Example Videos:
